@@ -10,9 +10,8 @@ Here are implementations for paper: <br />
 
 ![](figure/figure2.png) 
 
-## Tested with Python 3.6
-
 ## Requirements
+- Tested with Python 3.6
 - CUDA 9.0 or higher
 - PyTorch 1.1.0 
 - torchvision 0.3.0 
