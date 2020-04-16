@@ -1,4 +1,4 @@
-# Domain Adaptive Multi-Task Learning for Unsupervised Segmentation of EM Images
+# Unsupervised Mitochondria Segmentation  in EM Images via Domain Adaptive Multi-Task Learning
 
 Here are implementations for paper: <br />
 
