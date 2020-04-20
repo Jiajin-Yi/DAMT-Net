@@ -10,8 +10,7 @@ from skimage import morphology
 
 def postpre(img,save_dir,test_aug):
 
-    # split1 parameter
-    # fillHole
+    # test: testing subset parameter
     if test_aug == 5:
         img_fill = fillHole(img,save_dir,test_aug)
 
@@ -25,6 +24,20 @@ def postpre(img,save_dir,test_aug):
         img_open = openimg(img_fill,save_dir,test_aug,k1_size=15,k2_size=15)
 
         img_out = remove_small_object(img_open,save_dir,test_aug,area = 400)
+    # test: training subset parameter
+    # if test_aug == 5:
+    #     img_fill = fillHole(img, save_dir, test_aug)
+    #
+    #     img_open = openimg(img_fill, save_dir, test_aug, k1_size=20, k2_size=20)
+    #
+    #     img_out = remove_small_object(img_open, save_dir, test_aug, area=600)
+    #
+    # else:
+    #     img_fill = fillHole(img, save_dir, test_aug)
+    #
+    #     img_open = openimg(img_fill, save_dir, test_aug, k1_size=15, k2_size=15)
+    #
+    #     img_out = remove_small_object(img_open, save_dir, test_aug, area=600)
 
     # organize images in every epoch
     desired_path = save_dir + '/_postpre'+'_'+str(test_aug)+'/'

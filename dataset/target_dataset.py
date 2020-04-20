@@ -4,6 +4,7 @@ import numpy as np
 import random
 import matplotlib.pyplot as plt
 import collections
+import cv2
 import torch
 import torchvision
 from torch.utils import data
@@ -137,6 +138,89 @@ class targetDataSet_val(data.Dataset):
         label_as_np = torch.from_numpy(label_as_np).long()
         return image_as_tensor, label_as_np, original_label, np.array(img_shape), name
 
+
+class targetDataSet_test(data.Dataset):
+    def __init__(self, root_img, root_label, list_path, test_aug,crop_size=[512, 512],max_iters=None):
+
+        self.root_img = root_img
+        self.root_label = root_label
+        self.list_path = list_path
+        self.crop_size = crop_size
+        self.test_aug = test_aug
+        self.img_ids = [i_id.strip() for i_id in open(list_path)]
+        if not max_iters == None:
+            self.img_ids = self.img_ids * int(np.ceil(float(max_iters) / len(self.img_ids)))
+        self.files = []
+
+        for name in self.img_ids:
+            img_file = osp.join(self.root_img, name)
+            label_file = osp.join(self.root_label, name[:-4] + '.png')
+            self.files.append({
+                "img": img_file,
+                "label": label_file,
+                "name": name
+            })
+
+    def __len__(self):
+        return len(self.files)
+
+    def __getitem__(self, index):
+        datafiles = self.files[index]
+        test_aug = self.test_aug
+
+        image = Image.open(datafiles["img"])
+        image_as_np = np.asarray(image, np.float32)
+
+        label = Image.open(datafiles["label"])
+        name = datafiles["name"]
+        label_as_img = np.asarray(label, np.float32)
+
+        if test_aug == 1:
+            image_as_np = cv2.flip(image_as_np, 1)
+            label_as_img = cv2.flip(label_as_img, 1)
+
+        if test_aug == 2:
+            image_as_np = cv2.flip(image_as_np, 0)
+            label_as_img = cv2.flip(label_as_img, 0)
+
+        if test_aug == 3:
+            image_as_np = cv2.flip(image_as_np, -1)
+            label_as_img = cv2.flip(label_as_img, -1)
+
+        original_label = torch.from_numpy(np.asarray(label_as_img) / 255)
+
+        img_shape = image_as_np.shape
+
+        crop_n1 = math.ceil(img_shape[0] / self.crop_size[0])
+        crop_n2 = math.ceil(img_shape[1] / self.crop_size[1])
+        if crop_n1 == 1:
+            crop_n1 = crop_n1
+        else:
+            crop_n1 = crop_n1 + 1
+        if crop_n2 == 1:
+            crop_n2 = crop_n2
+        else:
+            crop_n2 = crop_n2 + 1
+
+        image_as_np = multi_cropping(image_as_np,
+                                     crop_size=self.crop_size[0],
+                                     crop_num1=crop_n1, crop_num2=crop_n2)
+
+        processed_list = []
+
+        for array in image_as_np:
+            image_to_add = normalization2(array, max=1, min=0)
+            processed_list.append(image_to_add)
+
+        image_as_tensor = torch.Tensor(processed_list)
+
+        label_as_np = multi_cropping(label_as_img,
+                                     crop_size=self.crop_size[0],
+                                     crop_num1=crop_n1, crop_num2=crop_n2)
+        label_as_np = label_as_np / 255
+
+        label_as_np = torch.from_numpy(label_as_np).long()
+        return image_as_tensor, label_as_np, original_label, np.array(img_shape), name
 
 if __name__ == '__main__':
     dst = targetDataSet("./data", is_transform=True)

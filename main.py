@@ -54,8 +54,8 @@ def main():
     sys.stdout = Logger(stream=sys.stdout)
     sys.stderr = Logger(stream=sys.stderr)
 
-    usecuda = False
-    cudnn.enabled = False
+    usecuda = True
+    cudnn.enabled = True
     args = get_arguments()
 
     # makedatalist
@@ -213,7 +213,7 @@ def main():
         recimg_source, feature_source, pred_source = model(images_source)
 
         loss_seg = loss_calc(pred_source, labels, args.gpu, usecuda)
-        loss_seg_value += loss_seg.data.cpu().numpy() / args.iter_size
+        loss_seg_value += loss_seg.data.cpu().numpy()
 
         loss_rec_source = rec_loss(recimg_source, images_source)
 
@@ -232,10 +232,9 @@ def main():
         loss_rec_target = rec_loss(recimg_target, images_target)
 
         loss_rec = (loss_rec_source + loss_rec_target) / 2
-        loss_rec_value += loss_rec.data.cpu().numpy() / args.iter_size
+        loss_rec_value += loss_rec.data.cpu().numpy()
 
         loss = loss_seg + args.lambda_rec * loss_rec
-        loss = loss / args.iter_size
         loss.backward()
 
         # Target Domain Adv loss
@@ -257,11 +256,10 @@ def main():
         loss_adv_feature = entropy_loss(Dfeature_out, adv_source_label)
 
         loss = args.lambda_adv_label * loss_adv_label + args.lambda_adv_feature * loss_adv_feature
-        loss = loss / args.iter_size
         loss.backward()
 
-        loss_adv_label_value += loss_adv_label.data.cpu().numpy() / args.iter_size
-        loss_adv_feature_value += loss_adv_feature.data.cpu().numpy() / args.iter_size
+        loss_adv_label_value += loss_adv_label.data.cpu().numpy()
+        loss_adv_feature_value += loss_adv_feature.data.cpu().numpy()
 
         # train domain label classifier
         for param in model_label.parameters():
@@ -275,7 +273,7 @@ def main():
         else:
             D_source_label = Variable(torch.FloatTensor(D_out.data.size()).fill_(source_label))
         loss_D = bce_loss(D_out, D_source_label)
-        loss_D = loss_D / args.iter_size / 2
+        loss_D = loss_D / 2
         loss_D.backward()
         loss_Dlabel_value += loss_D.data.cpu().numpy()
 
@@ -287,7 +285,7 @@ def main():
         else:
             D_target_label = Variable(torch.FloatTensor(D_out.data.size()).fill_(target_label))
         loss_D = bce_loss(D_out, D_target_label)
-        loss_D = loss_D / args.iter_size / 2
+        loss_D = loss_D / 2
         loss_D.backward()
         loss_Dlabel_value += loss_D.data.cpu().numpy()
 
@@ -303,7 +301,7 @@ def main():
         else:
             D_source_label = Variable(torch.LongTensor(D_out.size(0)).fill_(source_label))
         loss_D = entropy_loss(D_out, D_source_label)
-        loss_D = loss_D / args.iter_size / 2
+        loss_D = loss_D / 2
         loss_D.backward()
         loss_Dfeature_value += loss_D.data.cpu().numpy()
 
@@ -315,7 +313,7 @@ def main():
         else:
             D_target_label = Variable(torch.LongTensor(D_out.size(0)).fill_(target_label))
         loss_D = entropy_loss(D_out, D_target_label)
-        loss_D = loss_D / args.iter_size / 2
+        loss_D = loss_D / 2
         loss_D.backward()
         loss_Dfeature_value += loss_D.data.cpu().numpy()
 

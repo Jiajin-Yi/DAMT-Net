@@ -7,8 +7,8 @@ GPU = 0
 
 # source data
 INPUT_SIZE = '512,512'
-DATA_DIRECTORY_IMG = './data/orivncdata/train/img/'
-DATA_DIRECTORY_LABEL = './data/orivncdata/train/lab/'
+DATA_DIRECTORY_IMG = '../data/orivncdata/img/'
+DATA_DIRECTORY_LABEL = '../data/orivncdata/lab/'
 DATA_LIST_PATH = './dataset/vncdata_list/train.txt'
 
 # target data
@@ -18,14 +18,19 @@ DATA_DIRECTORY_TARGET_LABEL = '../data/cvlabdata/train/lab/'
 DATA_LIST_PATH_TARGET = './dataset/cvlabdata_list/train.txt'
 
 # target validation
-DATA_DIRECTORY_TEST = './data/cvlabdata/val/img/'
-DATA_DIRECTORY_TEST_LABEL = './data/cvlabdata/val/lab/'
-DATA_LIST_PATH_TEST = './dataset/cvlabdata_list/val.txt'
+DATA_DIRECTORY_VAL = '../data/cvlabdata/val/img/'
+DATA_DIRECTORY_VAL_LABEL = '../data/cvlabdata/val/lab/'
+DATA_LIST_PATH_VAL = './dataset/cvlabdata_list/val.txt'
+
+# target validation
+DATA_DIRECTORY_TEST = '../data/cvlabdata/test/img/'
+DATA_DIRECTORY_TEST_LABEL = '../data/cvlabdata/test/lab/'
+DATA_LIST_PATH_TEST = './dataset/cvlabdata_list/test.txt'
 
 # model setting
 ITER_START = 0
-PRETRAIN = 1
-RESTORE_FROM = './model_u-net_III_vnc.pwf'
+PRETRAIN = 0
+RESTORE_FROM = ''
 D1RESTORE_FROM = ''
 D2RESTORE_FROM = ''
 
@@ -47,13 +52,14 @@ STEP_SIZE_Df = 3000
 SAVE_NUM_IMAGES = 2
 SAVE_PRED_EVERY = 300
 SNAPSHOT_DIR = './snapshots/'
-SAVE_DIR = './testresult/'
-TEST_MODEL_PATH = ''
+SAVE_DIR = './testResult/'
+TEST_MODEL_PATH = './snapshots/CV_300.pth'
 
 LAMBDA_ADV_LABEL = 0.001
 LAMBDA_ADV_FEATURE = 0.001
 LAMBDA_REC = 0.0005
 
+TEST_AUG = 4 # 1: original 4: original + different flips
 BEST_TJAC = 0.50
 FROZEN_LAYER = []  # 'Conv_down1', 'Conv_down2', 'Conv_down3','Conv_down4','Conv_down5', 'Conv_up1', 'Conv_up2','Conv_up3', 'Conv_up4'
 RANDOM_LAYER = []  # ,'Conv_out', 'Conv_out1','Conv_out2'
@@ -65,7 +71,7 @@ def get_arguments():
       A list of parsed arguments.
     """
     parser = argparse.ArgumentParser(description="")
-    parser.add_argument("--model", type=int, default=MODEL,
+    parser.add_argument("--model", type=str, default=MODEL,
                         help="The segmentation network.")
     parser.add_argument("--batch-size", type=int, default=BATCH_SIZE,
                         help="Number of images sent to the network in one step.")
@@ -79,6 +85,10 @@ def get_arguments():
                         help="Path to the directory containing the source dataset.")
     parser.add_argument("--data-dir-test-label", type=str, default=DATA_DIRECTORY_TEST_LABEL,
                         help="Path to the directory containing the source dataset.")
+    parser.add_argument("--data-dir-val", type=str, default=DATA_DIRECTORY_VAL,
+                        help="Path to the directory containing the source dataset.")
+    parser.add_argument("--data-dir-val-label", type=str, default=DATA_DIRECTORY_VAL_LABEL,
+                        help="Path to the directory containing the source dataset.")
     parser.add_argument("--data-list", type=str, default=DATA_LIST_PATH,
                         help="Path to the file listing the images in the source dataset.")
     parser.add_argument("--input-size", type=str, default=INPUT_SIZE,
@@ -88,6 +98,8 @@ def get_arguments():
     parser.add_argument("--data-dir-target-label", type=str, default=DATA_DIRECTORY_TARGET_LABEL,
                         help="Path to the directory containing the target dataset.")
     parser.add_argument("--data-list-target", type=str, default=DATA_LIST_PATH_TARGET,
+                        help="Path to the file listing the images in the target dataset.")
+    parser.add_argument("--data-list-val", type=str, default=DATA_LIST_PATH_VAL,
                         help="Path to the file listing the images in the target dataset.")
     parser.add_argument("--data-list-test", type=str, default=DATA_LIST_PATH_TEST,
                         help="Path to the file listing the images in the target dataset.")
@@ -131,10 +143,14 @@ def get_arguments():
                         help="How many images to save.")
     parser.add_argument("--save-pred-every", type=int, default=SAVE_PRED_EVERY,
                         help="Save checkpoint every often.")
+    parser.add_argument("--save-dir", type=str, default=SAVE_DIR,
+                        help="Save dir.")
     parser.add_argument("--snapshot-dir", type=str, default=SNAPSHOT_DIR,
                         help="Where to save snapshots of the model.")
     parser.add_argument("--gpu", type=int, default=GPU,
                         help="choose gpu device.")
+    parser.add_argument("--test_aug", type=int, default=TEST_AUG,
+                        help="Test augmentation")
     parser.add_argument("--best_tjac", type=float, default=BEST_TJAC,
                         help="The best tjac")
     parser.add_argument("--frozen_layer", type=str, default=FROZEN_LAYER,

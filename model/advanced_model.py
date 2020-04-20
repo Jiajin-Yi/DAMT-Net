@@ -1,7 +1,6 @@
 # full assembly of the sub-parts to form the complete net
 import torch
 import torch.nn as nn
-from functions import ReverseLayerF
 import torch.nn.functional as F
 
 from torch.autograd import Variable
@@ -322,49 +321,6 @@ def unet_from_encoder_decoder(encoder, decoder):
     net.decoder.load_state_dict(new_decoder_dict)
 
     return net
-
-class DANN(nn.Module):
-    def __init__(self, in_channels, out_channels):
-        super(DANN, self).__init__()
-        self.Conv_down1 = Conv_down(in_channels, 64)
-        self.Conv_down2 = Conv_down(64, 128)
-        self.Conv_down3 = Conv_down(128, 256)
-        self.Conv_down4 = Conv_down(256, 512)
-        self.Conv_down5 = Conv_down(512, 1024)
-        self.Conv_up1 = Conv_up(1024,512)
-        self.Conv_up2 = Conv_up(512, 256)
-        self.Conv_up3 = Conv_up(256, 128)
-        self.Conv_up4 = Conv_up(128, 64)
-        self.domain_classifier = DomainDiscriminator(input_channels=64,input_size=512,num_classes=2, fc_classifier=3)
-
-        self.Conv_out = nn.Conv2d(64, out_channels, 1, padding=0, stride=1)
-
-        #self.Conv_final = nn.Conv2d(out_channels, out_channels, 1, padding=0, stride=1)
-
-    def forward(self, x):
-
-        x, conv1 = self.Conv_down1(x)
-        # print("dConv1 => down1|", x.shape)
-        x, conv2 = self.Conv_down2(x)
-        # print("dConv2 => down2|", x.shape)
-        x, conv3 = self.Conv_down3(x)
-        # print("dConv3 => down3|", x.shape)
-        x, conv4 = self.Conv_down4(x)
-        # print("dConv4 => down4|", x.shape)
-        _, x = self.Conv_down5(x)
-        # print("dConv5|", x.shape)
-        x = self.Conv_up1(x, conv4)
-        # print("up1 => uConv1|", x.shape)
-        x = self.Conv_up2(x, conv3)
-        # print("up2 => uConv2|", x.shape)
-        x = self.Conv_up3(x, conv2)
-        # print("up3 => uConv3|", x.shape)
-        x = self.Conv_up4(x, conv1)
-        reverse_feature = ReverseLayerF.apply(x)
-        domain_output = self.domain_classifier(reverse_feature)
-        x = self.Conv_out(x)
-        # x = self.Conv_final(x)
-        return domain_output, x
 
 class DomainDiscriminator(nn.Module):
     def __init__(self, input_channels,input_size,num_classes,fc_classifier = 3):
