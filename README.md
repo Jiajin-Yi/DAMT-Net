@@ -38,11 +38,7 @@ python main.py
 To obtain a more stable training process, we first train the segmentation network with the feature and label domain discriminators to get a better performance, and then jointly train the discriminators and the reconstruction network.
 
 ## Testing
-* You can download the pretrained model [III_VNC_to_Mouse_Brain_Hipp_model](https://drive.google.com/file/d/1UGEkU6dYxtURfISm2KVwoBLGANW-KMtq/view?usp=sharing), which is trained on Drosophila III VNC dataset with labels(source domain) and Mouse Brain Hippocampus training subset without labels(target domain).
-* Test the model
-```
-python prediction.py
-```
+* You can download the pre-trained models [III_VNC_to_Mouse_Brain_Hipp_model](https://drive.google.com/file/d/1NsmcjuTqJmLS_Go2OajUO-iwTKTEkMsU/view?usp=sharing)，the details of the pre-trained models and testing steps are in the file named 'README.md' in the downloaded folder
 
 ## Acknowledgment
 This code is heavily borrowed from [AdaptSegNet](https://github.com/wasidennis/AdaptSegNetand),[Y-Net](https://github.com/JorisRoels/domain-adaptive-segmentation) and [DANN](https://github.com/fungtion/DANN).
