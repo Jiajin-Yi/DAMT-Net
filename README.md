@@ -1,4 +1,4 @@
-# Domain Adaptive Multi-Task Learning for Unsupervised Segmentation of EM Images
+# Unsupervised Mitochondria Segmentation  in EM Images via Domain Adaptive Multi-Task Learning
 
 Here are implementations for paper: <br />
 
@@ -10,9 +10,8 @@ Here are implementations for paper: <br />
 
 ![](figure/figure2.png) 
 
-## Tested with Python 3.6
-
 ## Requirements
+- Tested with Python 3.6
 - CUDA 9.0 or higher
 - PyTorch 1.1.0 
 - torchvision 0.3.0 
@@ -39,7 +38,8 @@ python main.py
 To obtain a more stable training process, we first train the segmentation network with the feature and label domain discriminators to get a better performance, and then jointly train the discriminators and the reconstruction network.
 
 ## Testing
-* You can download the pretrained model which is trained on Drosophila III VNC dataset with labels(source domain) and Mouse Brain Hippocampus training subset without labels(target domain) [III_VNC_to_Mouse_Brain_Hipp_model](https://drive.google.com/file/d/1UGEkU6dYxtURfISm2KVwoBLGANW-KMtq/view?usp=sharing).
+* You can download the pretrained model [III_VNC_to_Mouse_Brain_Hipp_model](https://drive.google.com/file/d/1UGEkU6dYxtURfISm2KVwoBLGANW-KMtq/view?usp=sharing), which is trained on Drosophila III VNC dataset with labels(source domain) and Mouse Brain Hippocampus training subset without labels(target domain).
+* Test the model
 ```
 python prediction.py
 ```
