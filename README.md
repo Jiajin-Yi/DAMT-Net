@@ -8,7 +8,7 @@ Here are implementations for paper: <br />
 
 ## Network Structure
 
-![](figure/figure2.png) 
+![](figure/figure2.jpg) 
 
 ## Requirements
 - Tested with Python 3.6
