@@ -3,7 +3,7 @@ import argparse
 MODEL = 'AE'
 BATCH_SIZE = 1
 NUM_WORKERS = 4
-GPU = 0
+GPU = 1
 
 # source data
 INPUT_SIZE = '512,512'
